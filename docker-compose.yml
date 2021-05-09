@@ -1,0 +1,34 @@
+version: "3"
+networks: 
+    test-docker:
+        name: test-docker
+services: 
+    mongo:
+        restart: always
+        image: mongo
+        volumes:
+          - ./db:/data/db
+        environment: 
+            - MONGODB_PORT
+        networks:
+          - test-docker
+        ports: 
+          - ${MONGODB_PORT}:${MONGODB_PORT}
+    express:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - ./:/app
+        environment: 
+            - PORT
+            - APP_NAME
+        ports: 
+            - ${PORT}:${PORT}
+        command: npm run start:dev
+        depends_on: 
+            - mongo
+        networks: 
+            - test-docker
+        restart: always
+        
